@@ -1,0 +1,383 @@
+\ProvidesPackage{OUC}
+
+% Required packages
+\RequirePackage{etoolbox}
+\RequirePackage{tikz}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{fontspec}
+\RequirePackage{ctex}
+\RequirePackage[most]{tcolorbox}
+\tcbuselibrary{skins,breakable,minted}
+\RequirePackage{multicol}
+
+% --- Color definitions based on OUC ocean theme ---
+\definecolor{oucblue}{RGB}{52, 144, 220}        % 主要蓝色 - 从logo提取
+\definecolor{ouclightblue}{RGB}{135, 196, 240}  % 浅蓝色 - 海洋色系
+\definecolor{oucdeepblue}{RGB}{20,100,158}      % 深蓝色 - 海洋深色
+\definecolor{oucwhite}{RGB}{255, 255, 255}      % 白色
+\definecolor{oucgray}{RGB}{128, 128, 128}       % 灰色
+\definecolor{ouclightgray}{RGB}{240, 240, 240}  % 浅灰色
+\definecolor{ouctransparent}{RGB}{255, 255, 255} % 透明背景用
+
+% 新增淡色系颜色
+\definecolor{oucpink}{RGB}{255, 182, 193}       % 淡粉色
+\definecolor{ouclightpink}{RGB}{255, 218, 224}  % 更淡的粉色
+\definecolor{oucgreen}{RGB}{144, 238, 144}      % 淡绿色
+\definecolor{ouclightgreen}{RGB}{193, 255, 193} % 更淡的绿色
+\definecolor{oucpurple}{RGB}{221, 160, 221}     % 淡紫色
+\definecolor{ouclightpurple}{RGB}{238, 200, 238}% 更淡的紫色
+\definecolor{oucyellow}{RGB}{255, 255, 224}     % 淡黄色
+\definecolor{oucorange}{RGB}{255, 218, 185}     % 淡橙色
+
+% --- Font settings ---
+% 设置中文字体
+\setCJKmainfont{KaiTi}                          % 正文中文用楷体
+\setCJKsansfont{KaiTi}                          % 无衬线字体也用楷体
+\setCJKmonofont{SimSun-ExtB}                    % 等宽字体（win）SimSun-ExtB
+\setmainfont{Times New Roman}                   % 英文统一用Times New Roman
+\setsansfont{Times New Roman}                   % 英文无衬线也用Times New Roman
+\setmonofont{Consolas}                          % 英文等宽字体用Consolas
+
+% --- Geometry settings for 4:3 aspect ratio ---
+\geometry{paperwidth=12cm, paperheight=9cm}
+
+% --- Background templates ---
+% 封面背景
+\newcommand{\titlebackground}{
+    \setbeamertemplate{background}{
+        \includegraphics[width=\paperwidth,height=\paperheight]{bkg/ouc_background.pdf}
+    }
+}
+
+% 目录背景
+\newcommand{\tocbackground}{
+    \setbeamertemplate{background}{
+        \includegraphics[width=\paperwidth,height=\paperheight]{bkg/ouc_toc_background.pdf}
+    }
+}
+
+% 正文背景
+\newcommand{\contentbackground}{
+    \setbeamertemplate{background}{
+        \includegraphics[width=\paperwidth,height=\paperheight]{bkg/ouc_content_background.pdf}
+    }
+}
+
+% --- Color scheme settings ---
+\setbeamercolor{normal text}{fg=black, bg=white}
+\setbeamercolor{structure}{fg=oucdeepblue}
+\setbeamercolor{title}{fg=oucdeepblue}
+\setbeamercolor{subtitle}{fg=oucblue}
+\setbeamercolor{author}{fg=oucdeepblue}
+\setbeamercolor{date}{fg=oucdeepblue}
+\setbeamercolor{institute}{fg=oucblue}
+
+% 框架标题颜色
+\setbeamercolor{frametitle}{fg=oucdeepblue, bg=}
+\setbeamercolor{framesubtitle}{fg=oucblue, bg=}
+
+% 列表颜色
+\setbeamercolor{item}{fg=oucblue}
+\setbeamercolor{subitem}{fg=ouclightblue}
+\setbeamercolor{subsubitem}{fg=oucgray}
+
+% 页脚颜色 - 透明背景
+\setbeamercolor{footline}{fg=oucwhite, bg=}
+\setbeamercolor{navigation symbols}{fg=oucblue}
+
+% --- Font settings ---
+\setbeamerfont{title}{series=\bfseries, size=\Large}
+\setbeamerfont{subtitle}{series=\mdseries, size=\large}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{date}{size=\normalsize}
+\setbeamerfont{institute}{size=\normalsize}
+
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamerfont{framesubtitle}{series=\mdseries, size=\normalsize}
+
+% Block字体 - 缩小尺寸
+\setbeamerfont{block title}{series=\bfseries, size=\small}
+\setbeamerfont{block body}{size=\footnotesize}
+
+\setbeamerfont{footline}{size=\tiny}
+
+% --- Template settings ---
+% 启用导航条
+\setbeamertemplate{navigation symbols}{
+    \insertslidenavigationsymbol
+    \insertframenavigationsymbol
+    \insertsubsectionnavigationsymbol
+    \insertsectionnavigationsymbol
+    \insertdocnavigationsymbol
+    \insertbackfindforwardnavigationsymbol
+}
+
+% 导航条颜色设置
+\setbeamercolor{navigation symbols dimmed}{fg=oucblue!50}
+\setbeamercolor{navigation symbols}{fg=oucblue}
+
+% 修改正文区域宽度，右边留2cm空间
+\newlength{\contentwidth}
+\setlength{\contentwidth}{\dimexpr\paperwidth-2cm-1cm\relax} % 减去右边2cm和左边1cm边距
+
+% 修复关键问题：正确设置文本宽度和行宽度
+\setlength{\textwidth}{\contentwidth}
+\setlength{\linewidth}{\contentwidth}
+
+% 处理段落设置，避免overfull
+\AtBeginDocument{
+    \setlength{\parindent}{0pt}     % 取消段落首行缩进
+    \setlength{\parskip}{0.5ex}     % 设置段落间距
+    \tolerance=1000                 % 增加容错率
+    \emergencystretch=3pt          % 允许额外的伸缩
+}
+
+\tcbset{
+  OUCbase/.style={
+    enhanced jigsaw,
+    breakable,
+    opacityback=0,
+    colback=ouctransparent,
+    frame hidden,
+    drop shadow,
+    arc=4pt, outer arc=4pt,
+    left=4pt,right=4pt,top=4pt,bottom=4pt,
+    fontupper=\small, fontlower=\small,   % 主体文字
+  },
+  OUCtitle/.style args={#1}{
+    title={\insertblocktitle},
+    colbacktitle=#1!60,
+    coltitle=white,
+    opacitybacktitle=0.6,
+    boxed title style={
+      arc=4pt, outer arc=0pt,
+      left=4pt,right=4pt,top=1pt,bottom=1pt,
+      boxrule=0pt
+    },
+    fonttitle=\small\bfseries
+  }
+}
+
+% 定义每种 block/环境
+\newtcolorbox{OUCblock}[1][]{OUCbase, OUCtitle={oucdeepblue}, coltext=black, #1}
+\setbeamertemplate{block begin}{\par\vskip\medskipamount\begin{OUCblock}}
+\setbeamertemplate{block end}{\end{OUCblock}\vskip\smallskipamount}
+
+\newtcolorbox{OUCexample}[1][]{OUCbase, OUCtitle={oucgreen}, coltext=black, #1}
+\setbeamertemplate{block example begin}{\par\vskip\medskipamount\begin{OUCexample}}
+\setbeamertemplate{block example end}{\end{OUCexample}\vskip\smallskipamount}
+
+\newtcolorbox{OUCalert}[1][]{OUCbase, OUCtitle={oucpink}, coltext=black, #1}
+\setbeamertemplate{block alerted begin}{\par\vskip\medskipamount\begin{OUCalert}}
+\setbeamertemplate{block alerted end}{\end{OUCalert}\vskip\smallskipamount}
+
+% 定义 environment
+\newtcolorbox{OUCdefinition}[1][]{OUCbase, OUCtitle={oucorange}, coltext=black, #1}
+\newtcolorbox{OUClemma}[1][]{OUCbase,     OUCtitle={oucgray},   coltext=black, #1}
+\newtcolorbox{OUCtheorem}[1][]{OUCbase,    OUCtitle={oucpurple}, coltext=black, #1}
+\newtcolorbox{OUCproof}[1][]{OUCbase,      OUCtitle={oucblue},  coltext=black, #1}
+
+% —— 先清除旧环境 —— 
+\let\definition\relax     \let\enddefinition\relax
+\let\lemma\relax          \let\endlemma\relax
+\let\theorem\relax        \let\endtheorem\relax
+\let\proof\relax          \let\endproof\relax
+
+% —— 用 \newenvironment 套一层，处理可选标题 —— 
+\newenvironment{definition}[1][]{
+  \ifstrempty{#1}
+    {\begin{OUCdefinition}[title={定义}]}
+    {\begin{OUCdefinition}[title={定义：#1}]}
+}{
+  \end{OUCdefinition}
+}
+
+\newenvironment{lemma}[1][]{
+  \ifstrempty{#1}
+    {\begin{OUClemma}[title={引理}]}
+    {\begin{OUClemma}[title={引理：#1}]}
+}{
+  \end{OUClemma}
+}
+
+\newenvironment{theorem}[1][]{
+  \ifstrempty{#1}
+    {\begin{OUCtheorem}[title={定理}]}
+    {\begin{OUCtheorem}[title={定理：#1}]}
+}{
+  \end{OUCtheorem}
+}
+
+\newenvironment{proof}[1][]{
+  \ifstrempty{#1}
+    {\begin{OUCproof}[title={证明}]}
+    {\begin{OUCproof}[title={证明：#1}]}
+}{
+  \end{OUCproof}
+}
+
+% —— （可选）控制与 Beamer block 的垂直间距 —— 
+\setbeamertemplate{definition begin}{\par\vskip\medskipamount}
+\setbeamertemplate{definition end}{\vskip\smallskipamount}
+\setbeamertemplate{lemma begin}{\par\vskip\medskipamount}
+\setbeamertemplate{lemma end}{\vskip\smallskipamount}
+\setbeamertemplate{theorem begin}{\par\vskip\medskipamount}
+\setbeamertemplate{theorem end}{\vskip\smallskipamount}
+\setbeamertemplate{proof begin}{\par\vskip\medskipamount}
+\setbeamertemplate{proof end}{\vskip\smallskipamount}
+
+% --- 代码环境设置 - 使用minted，透明背景 ---
+% minted设置
+\usemintedstyle{default}
+\renewcommand\theFancyVerbLine{\arabic{FancyVerbLine}}
+
+% 定义一个新环境 code[<标题>]{<语言>}，添加自动换行
+\newtcblisting{code}[2][]{%
+  OUCbase,
+  OUCtitle={ouclightblue},
+  title={#1}, title filled=true,
+  listing engine=minted,
+  listing only,
+  minted language=#2,
+  minted style=default,
+  minted options={
+    linenos, numbersep=5pt, fontsize=\tiny, encoding=utf8,
+    breaklines=true, breakanywhere=true,
+    baselinestretch=0.9
+  },
+  before skip=\medskipamount,
+  after skip=\smallskipamount,
+}
+
+% 列表符号
+\setbeamertemplate{itemize item}{\color{oucblue}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{ouclightblue}$\circ$}
+\setbeamertemplate{itemize subsubitem}{\color{oucgray}$-$}
+
+% --- Title page template ---
+\setbeamertemplate{title page}{
+    \begin{minipage}[c][0.8\textheight]{0.5\textwidth}
+        \centering
+        \vspace{0.1\textheight}
+        
+        {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle}
+        
+        \vskip 0.5cm
+        {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle}
+        
+        \vskip 0.5cm
+        {\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor}
+        
+        \vskip 0.5cm
+        {\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute}
+        
+        \vskip 0.5cm
+        {\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate}
+    \end{minipage}
+}
+
+% --- Footer template ---
+\setbeamertemplate{navigation symbols}{} 
+\setbeamertemplate{footline}{
+    % 导航符号部分
+    \hfill%
+    {\usebeamercolor[fg]{navigation symbols}\usebeamerfont{navigation symbols}%
+    \insertslidenavigationsymbol%
+    \insertframenavigationsymbol%
+    \insertsubsectionnavigationsymbol%
+    \insertsectionnavigationsymbol%
+    \insertdocnavigationsymbol%
+    \insertbackfindforwardnavigationsymbol%
+    \hspace{0.2cm}%
+    }
+    \vskip 0.1cm
+    
+    % 页脚信息 - 关键：减少宽度，避免溢出
+    % 使用 \paperwidth - 1cm 而不是 \paperwidth
+    \begin{beamercolorbox}[wd=\dimexpr\paperwidth-0.2cm\relax,ht=0.4cm,dp=0.08cm]{footline}
+        \usebeamerfont{footline}%
+        % 第一行：作者信息和单位
+        \hspace{0.2cm}\insertshortauthor\hfill\insertshortinstitute\hspace{0.2cm}\par
+        \vskip 0.02cm  
+        % 第二行：标题和页码
+        \hspace{0.2cm}\insertshorttitle\hfill\insertframenumber/\inserttotalframenumber\hspace{0.2cm}\par
+        \vskip 0.02cm
+    \end{beamercolorbox}
+}
+\setbeamercolor{navigation symbols}{fg=white}
+
+% 重定义maketitle以应用封面背景
+\renewcommand{\maketitle}{
+    \begingroup
+        \titlebackground
+        \begin{frame}
+            \titlepage
+        \end{frame}
+    \endgroup
+    \contentbackground  % 切换到正文背景
+}
+
+% --- Frame title template ---
+\setbeamertemplate{frametitle}{
+    \vspace{0.2cm}
+    \begin{beamercolorbox}[wd=\contentwidth,ht=0.8cm,dp=0.2cm,leftskip=0.3cm,rightskip=0.3cm,left]{frametitle}
+        {\usebeamerfont{frametitle}\insertframetitle}
+        \ifx\insertframesubtitle\@empty\else
+            \vskip0.1cm
+            {\usebeamerfont{framesubtitle}\insertframesubtitle}
+        \fi
+    \end{beamercolorbox}
+    \vspace{0.1cm}
+}
+
+% --- Table of Contents settings ---
+\setbeamertemplate{section in toc}{
+    \color{oucdeepblue}$\blacktriangleright$~\inserttocsection
+}
+\setbeamertemplate{subsection in toc}{
+    \hspace{1em}\color{oucblue}$\circ$~\inserttocsubsection
+}
+
+% 在每个section开始时显示目录并高亮当前section - 传统beamer风格
+\AtBeginSection[]{
+    \begingroup
+        \tocbackground
+        \begin{frame}{目录}
+            \begin{multicols}{2}
+                \small
+                \tableofcontents[sectionstyle=show/shaded,subsectionstyle=show/shaded/hide,subsubsectionstyle=show/shaded/hide]
+            \end{multicols}
+        \end{frame}
+    \endgroup
+    \contentbackground
+}
+
+\AtBeginSubsection[]{
+    \begingroup
+        \tocbackground
+        \begin{frame}{目录}
+            \begin{multicols}{2}
+                \small
+                \tableofcontents[sectionstyle=show/shaded,subsectionstyle=show/shaded/hide,subsubsectionstyle=show/shaded/hide]
+            \end{multicols}
+        \end{frame}
+    \endgroup
+    \contentbackground
+}
+
+% --- Additional commands ---
+% 海洋色系强调文本
+\newcommand{\oucemph}[1]{\textcolor{oucblue}{\textbf{#1}}}
+\newcommand{\oucalert}[1]{\textcolor{oucdeepblue}{\textbf{#1}}}
+
+% 海洋色系文本颜色
+\newcommand{\oceanblue}[1]{\textcolor{oucblue}{#1}}
+\newcommand{\deepocean}[1]{\textcolor{oucdeepblue}{#1}}
+\newcommand{\lightocean}[1]{\textcolor{ouclightblue}{#1}}
+
+% 取消帧标题延续编号
+\setbeamertemplate{frametitle continuation}{}
+
+% 设置默认内容背景
+\AtBeginDocument{\contentbackground}
